@@ -1,0 +1,13 @@
+-- -- liquibase formatted sql
+-- -- changeset rashmita.subedi:1
+--
+-- -- preconditions onFail:CONTINUE onError:HALT
+-- -- precondition-sql-check expectedResult:0 SELECT COUNT(*) FROM bank_type
+-- INSERT INTO bank_type (description, icon, name,version)
+-- VALUES
+--     ('COMMERCIAL', 'commercial', 'COMMERCIAL',0),
+--     ('DEVELOPMENT', 'development', 'DEVELOPMENT',0),
+--     ('INVESTMENT', 'investment', 'INVESTMENT',0),
+--     ('CENTRAL', 'central', 'CENTRAL',0),
+--     ('RETAIL', 'retail', 'RETAIL',0),
+--     ('COOPERATIVE', 'cooperative', 'COOPERATIVE',0);
