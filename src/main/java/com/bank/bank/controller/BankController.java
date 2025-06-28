@@ -1,40 +1,65 @@
 package com.bank.bank.controller;
 
-import com.bank.bank.dto.BankIdRequest;
-import com.bank.bank.dto.BankRequestDto;
-import com.bank.bank.dto.ServerResponse;
+import com.bank.bank.constants.ApiConstants;
+import com.bank.bank.dto.*;
+import com.bank.bank.exception.NotFoundException;
 import com.bank.bank.service.BankService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import static com.bank.bank.constants.ApiConstants.*;
+
 @RestController
-@RequestMapping("/bank")
+@RequestMapping(ApiConstants.BANK)
 @RequiredArgsConstructor
 public class BankController {
     private final BankService bankService;
-    @PostMapping("/createBank")
+    @PostMapping(CREATE)
     public ServerResponse<?> createBank(@Valid @RequestBody BankRequestDto bankRequestDto) {
         return bankService.createBank(bankRequestDto);
     }
 
-    @PostMapping("/updateBank")
-    public ServerResponse<?> updateBank(@Valid @RequestBody BankRequestDto bankRequestDto) {
-        return bankService.updateBank(bankRequestDto);
+    @PostMapping(UPDATE)
+    public ServerResponse<?> updateBank(@Valid @RequestBody BankUpdateRequest bankUpdateRequest) {
+        return bankService.updateBank(bankUpdateRequest);
     }
 
-    @PostMapping("/deleteBank")
-    public ServerResponse<?> deleteBank(@Valid @RequestBody BankIdRequest bankIdRequest) {
+    @PostMapping(DELETE)
+    public ServerResponse<?> deleteBank(@Valid @RequestBody  Long bankIdRequest) {
         return bankService.deleteBank(bankIdRequest);
     }
 
-    @GetMapping("/getBankById")
-    public ServerResponse<?> getBankById(@Valid @RequestBody BankIdRequest bankIdRequest) {
+    @GetMapping(GET+BY+ID)
+    public ServerResponse<?> getBankById(@Valid @RequestBody Long bankIdRequest) throws NotFoundException {
         return bankService.getBankById(bankIdRequest);
     }
 
-    @GetMapping("/getAllBanks")
-    public ServerResponse<?> getAllBanks() {
-        return bankService.getAllBanks();
+    @GetMapping(GET+BY+NAME)
+    public ServerResponse<?> getByBankName(@Valid @RequestBody String bankNameRequest) throws NotFoundException {
+        return bankService.getByBankName(bankNameRequest);
+    }
+
+    @GetMapping(GET+ALL)
+    public ServerResponse<?> getAllBanks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bankService.getAllBanks(pageable);
+    }
+    @GetMapping(SORTING+DECENDING+DATE)
+    public ServerResponse<?> getAllBanks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "establishedDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return bankService.getAllBanks(pageable);
     }
 }

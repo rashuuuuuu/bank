@@ -1,4 +1,4 @@
-package com.bank.bank;
+package com.bank.bank.validation;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

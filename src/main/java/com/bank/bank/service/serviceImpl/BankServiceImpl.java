@@ -1,18 +1,36 @@
 package com.bank.bank.service.serviceImpl;
 
 import com.bank.bank.BankMapper.BankMapper;
-import com.bank.bank.dto.BankIdRequest;
-import com.bank.bank.dto.BankRequestDto;
-import com.bank.bank.dto.ServerResponse;
+import com.bank.bank.dto.*;
+import com.bank.bank.entities.Bank;
+import com.bank.bank.exception.NotFoundException;
+import com.bank.bank.repository.BankRepository;
 import com.bank.bank.service.BankService;
 import com.bank.bank.util.ResponseUtility;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Pageable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BankServiceImpl implements BankService {
     @Autowired
-    BankMapper bankMapper;
+    private final BankMapper bankMapper;
+
+    @Autowired
+   private final ModelMapper modelMapper;
+    @Autowired
+    private final BankRepository bankRepository;
+
+    public BankServiceImpl(BankMapper bankMapper, ModelMapper modelMapper, BankRepository bankRepository) {
+        this.bankMapper = bankMapper;
+        this.modelMapper = modelMapper;
+        this.bankRepository = bankRepository;
+    }
 
     @Override
     public ServerResponse createBank(BankRequestDto bankRequestDto) {
@@ -21,26 +39,52 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
-    public ServerResponse updateBank(BankRequestDto bankRequestDto) {
-        bankMapper.updateBankDetails(bankRequestDto);
+    public ServerResponse updateBank(BankUpdateRequest bankUpdateRequest) {
+        bankMapper.updateBankDetails(bankUpdateRequest);
         return ResponseUtility.getSuccessfulServerResponse("Bank Updated Successfully");
     }
 
     @Override
-    public ServerResponse deleteBank(BankIdRequest bankIdRequest) {
+    public ServerResponse deleteBank(Long bankIdRequest) {
         bankMapper.deleteBank(bankIdRequest);
         return ResponseUtility.getSuccessfulServerResponse("Bank Deleted Successfully");
     }
 
     @Override
-    public ServerResponse getBankById(BankIdRequest bankIdRequest) {
-        bankMapper.getDetailsById(bankIdRequest);
-        return ResponseUtility.getSuccessfulServerResponse("Presenting Bank Details");
+    public ServerResponse getBankById(Long bankIdRequest) throws NotFoundException {
+        return ResponseUtility.getSuccessfulServerResponse(
+                bankMapper.getDetailsById(bankIdRequest),
+                "Presenting Bank Details"
+        );
+    }
+
+
+
+    @Override
+    public ServerResponse getAllBanks(Pageable pageable) {
+        Page<Bank> bankPage = bankRepository.findAll( pageable);
+        List<BankResponseDto> bankResponseDtos = bankPage.stream()
+                .map(bank -> modelMapper.map(bank, BankResponseDto.class))
+                .collect(Collectors.toList());
+
+        return ResponseUtility.getSuccessfulServerResponse(
+                new PagingResponse<>(
+                        bankResponseDtos,
+                        bankPage.getTotalPages(),
+                        bankPage.getTotalElements(),
+                        bankPage.getSize(),
+                        bankPage.getNumber(),
+                        bankPage.isEmpty()
+                ), "All Banks Found");
     }
 
     @Override
-    public ServerResponse getAllBanks() {
-        bankMapper.getAllDetails();
-        return ResponseUtility.getSuccessfulServerResponse("All Bank Details");
+    public ServerResponse getByBankName(String bankNameRequest) throws NotFoundException {
+        return ResponseUtility.getSuccessfulServerResponse(
+                bankMapper.getByBankName(bankNameRequest),
+                "Presenting Bank Details"
+        );
     }
+
+
 }

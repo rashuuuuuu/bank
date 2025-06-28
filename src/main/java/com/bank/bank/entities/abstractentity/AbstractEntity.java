@@ -1,5 +1,6 @@
 package com.bank.bank.entities.abstractentity;
 
+import com.bank.bank.entities.Bank;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +20,4 @@ public abstract class  AbstractEntity implements Serializable {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
-
 }

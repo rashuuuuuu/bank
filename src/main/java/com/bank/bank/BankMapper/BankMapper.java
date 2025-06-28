@@ -1,26 +1,21 @@
 package com.bank.bank.BankMapper;
 
-import com.bank.bank.dto.BankIdRequest;
+import com.bank.bank.dto.BankNameRequest;
 import com.bank.bank.dto.BankRequestDto;
 import com.bank.bank.dto.BankResponseDto;
+import com.bank.bank.dto.BankUpdateRequest;
 import com.bank.bank.entities.Bank;
-import com.bank.bank.entities.BankStatus;
 import com.bank.bank.entities.StatusConstants;
+import com.bank.bank.exception.NotFoundException;
 import com.bank.bank.repository.BankRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.mapstruct.ap.internal.conversion.ConversionUtils.uuid;
 
 @Service
 @RequiredArgsConstructor
@@ -44,31 +39,43 @@ public class BankMapper {
         return bankRepository.save(bank);
     }
 
-    public Bank updateBankDetails(BankRequestDto bankRequestDto) {
-        Bank bank = new Bank();
-        if (bankRequestDto.getBankName() != null) {
-            bank.setBankName(bankRequestDto.getBankName());
-            bank.setBankAddress(bankRequestDto.getBankAddress());
-            bank.setBankCode(bankRequestDto.getBranchCode());
-            bank.setEstablishedDate(bankRequestDto.getEstablishedDate());
+    public Bank updateBankDetails(BankUpdateRequest bankUpdateRequest) {
+
+        String bankName = bankUpdateRequest.getBankName();
+        Bank bank = bankRepository.getByBankName(bankName);
+        if (bankUpdateRequest.getBankName() != null) {
+            bank.setBankName(bankUpdateRequest.getBankName());
+            bank.setBankAddress(bankUpdateRequest.getBankAddress());
+            bank.setBankCode(bankUpdateRequest.getBranchCode());
+            bank.setEstablishedDate(bankUpdateRequest.getEstablishedDate());
         }
         return bankRepository.save(bank);
-        }
-
-    public List<BankResponseDto> getDetailsById(BankIdRequest bankIdRequest) {
-        Long bankId = bankIdRequest.getBankId();
-        Optional<Bank> optionalBank = bankRepository.getBankDetailsById(bankId);
-
-        return optionalBank
-                .map(bank -> modelMapper.map(bank, BankResponseDto.class))
-                .map(List::of)
-                .orElse(Collections.emptyList());
     }
 
+    public BankResponseDto getDetailsById(Long bankIdRequest) throws NotFoundException {
 
+        Bank bank = bankRepository.getBankDetailsById(bankIdRequest)
+                .orElseThrow(() -> new NotFoundException("Bank not found"));
 
-    public void deleteBank(BankIdRequest bankIdRequest) {
-        Optional<Bank> bankOptional = bankRepository.findById(Long.valueOf(bankIdRequest.getBankId()));
+        if (bank.getStatus() != StatusConstants.ACTIVE || bank.getBankCode() == null) {
+            throw new NotFoundException("Bank is inactive or missing bank code");
+        }
+
+        return modelMapper.map(bank, BankResponseDto.class);
+    }
+
+    public BankResponseDto getByBankName(String bankNameRequest)throws NotFoundException {
+        Bank bank = bankRepository.getBankDetailsByBankNameIgnoreCase(bankNameRequest)
+                .orElseThrow(() -> new NotFoundException("Bank not found"));
+
+        if (bank.getStatus() != StatusConstants.ACTIVE || bank.getBankCode() == null) {
+            throw new NotFoundException("Bank is inactive or missing bank code");
+        }
+        return modelMapper.map(bank, BankResponseDto.class);
+    }
+
+    public void deleteBank(Long bankIdRequest) {
+        Optional<Bank> bankOptional = bankRepository.findById(Long.valueOf(bankIdRequest));
 
         if (bankOptional.isPresent()) {
             Bank foundBank = bankOptional.get();
@@ -78,15 +85,8 @@ public class BankMapper {
             System.out.println("Bank does not exist");
         }
     }
-    public List<BankResponseDto> getAllDetails() {
-        List<Bank> banks = bankRepository.findAll();
 
-        return banks.stream()
-                .map(bank -> modelMapper.map(bank, BankResponseDto.class))
-                .collect(Collectors.toList());
-    }
-
-    }
+}
 
 
 

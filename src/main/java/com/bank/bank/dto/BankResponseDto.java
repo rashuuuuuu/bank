@@ -1,8 +1,14 @@
 package com.bank.bank.dto;
+import com.bank.bank.entities.StatusConstants;
+import lombok.*;
 
-import org.springframework.http.HttpStatus;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class BankResponseDto {
-    HttpStatus status;
-    String message;
+    private StatusConstants status;
+    private String bankName;
+    private String address;
+    private String branchCode;
+    private String establishedDate;
 }

@@ -23,8 +23,6 @@ public class ServerResponse<T> {
 
     private String message;
 
-    private String code;
-
     private T data;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss a")

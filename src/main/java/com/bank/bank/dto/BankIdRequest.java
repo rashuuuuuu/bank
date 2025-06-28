@@ -1,12 +1,11 @@
 package com.bank.bank.dto;
 
+import com.bank.bank.entities.ModelBase;
 import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class BankIdRequest {
+public class BankIdRequest extends ModelBase {
     private Long bankId;
-
 }

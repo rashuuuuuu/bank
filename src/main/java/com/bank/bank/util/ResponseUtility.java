@@ -96,7 +96,6 @@ public class ResponseUtility {
     public static ServerResponse getSuccessfulServerResponse(String message) {
         return ServerResponse.builder()
                 .success(true)
-                .code(ServerResponseCodeConstant.SUCCESS)
                 .message(message)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
@@ -107,7 +106,6 @@ public class ResponseUtility {
         return ServerResponse.builder()
                 .success(true)
                 .message(message)
-                .code(ServerResponseCodeConstant.SUCCESS)
                 .data(data)
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
@@ -153,7 +151,6 @@ public class ResponseUtility {
     public static ServerResponse getFailedServerResponse(String message, HttpStatus httpStatus) {
         return ServerResponse.builder()
                 .success(false)
-                .code(ServerResponseCodeConstant.FAILURE)
                 .message(message)
                 .httpStatus(httpStatus)
                 .build();
