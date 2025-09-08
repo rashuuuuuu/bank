@@ -10,12 +10,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-
 import static com.bank.bank.constants.ApiConstants.*;
 
 @RestController
 @RequestMapping(ApiConstants.BANK)
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:55788")
 public class BankController {
     private final BankService bankService;
     @PostMapping(CREATE)
@@ -34,12 +34,12 @@ public class BankController {
     }
 
     @GetMapping(GET+BY+ID)
-    public ServerResponse<?> getBankById(@Valid @RequestBody Long bankIdRequest) throws NotFoundException {
+    public ServerResponse<?> getBankById(@Valid @RequestParam("bankIdRequest") Long bankIdRequest) throws NotFoundException {
         return bankService.getBankById(bankIdRequest);
     }
 
     @GetMapping(GET+BY+NAME)
-    public ServerResponse<?> getByBankName(@Valid @RequestBody String bankNameRequest) throws NotFoundException {
+    public ServerResponse<?> getByBankName(@Valid @RequestParam("bankNameRequest") String bankNameRequest) throws NotFoundException {
         return bankService.getByBankName(bankNameRequest);
     }
 

@@ -1,6 +1,4 @@
 package com.bank.bank.BankMapper;
-
-import com.bank.bank.dto.BankNameRequest;
 import com.bank.bank.dto.BankRequestDto;
 import com.bank.bank.dto.BankResponseDto;
 import com.bank.bank.dto.BankUpdateRequest;
@@ -75,7 +73,7 @@ public class BankMapper {
     }
 
     public void deleteBank(Long bankIdRequest) {
-        Optional<Bank> bankOptional = bankRepository.findById(Long.valueOf(bankIdRequest));
+        Optional<Bank> bankOptional = bankRepository.findById(bankIdRequest);
 
         if (bankOptional.isPresent()) {
             Bank foundBank = bankOptional.get();
