@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-backend
+  namespace: bank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank-backend
+  template:
+    metadata:
+      labels:
+        app: bank-backend
+    spec:
+      containers:
+        - name: bank-backend
+          image: harbor.local/bank-app/bank-backend:1.0
+          ports:
+            - containerPort: 8080

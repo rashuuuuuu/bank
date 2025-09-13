@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/rashuuuuuu/bank.git'
@@ -30,14 +31,26 @@ pipeline {
             }
         }
 
-        stage('Push image to Hub') {
+        stage('Push Docker Image') {
             steps {
-                bat 'docker login -u rashmitasubedi -p rashmita@123'
-                bat 'docker push rashmitasubedi/bank:latest'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    // Use password via --password-stdin (more secure)
+                    bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
+                    bat 'docker push rashmitasubedi/bank:latest'
+                }
             }
         }
-    }
 
+    stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    kubernetesDeploy(
+                        configs: 'k8s/deployment.yaml,k8s/service.yaml'
+                        kubeconfigId: 'k8sconfigpwd'
+                    )
+                }
+            }
+        }
     post {
         always {
             cleanWs()
