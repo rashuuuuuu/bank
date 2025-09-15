@@ -8,5 +8,5 @@ spec:
   selector:
     app: bank-backend
   ports:
-    - port: 80
-      targetPort: 8080
+    - port: 80         # port inside cluster
+      targetPort: 8080 # port your container listens on
