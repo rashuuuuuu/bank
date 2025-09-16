@@ -20,7 +20,7 @@ spec:
           image: 172.17.78.58:8000/bank/bank-app:1.0
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8089   # Updated to match your server.port
+            - containerPort: 8089
           resources:
             requests:
               cpu: "200m"
@@ -30,17 +30,11 @@ spec:
               memory: "512Mi"
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:mysql://mysql-service:3306/bankdb
+              value: jdbc:mysql://mysql-service:3306/bank
             - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: bank-db-secret
-                  key: username
+              value: root
             - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: bank-db-secret
-                  key: password
+              value: root
             - name: SPRING_LIQUIBASE_ENABLED
               value: "false"
           livenessProbe:
