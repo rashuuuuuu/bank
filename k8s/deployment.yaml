@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: bank-app
-          image: 172.17.78.58:8000/bank/bank-app:1.0
+          image: 172.17.78.58:8000/bank/bank-app:1.1
           ports:
             - containerPort: 8089
           env:
