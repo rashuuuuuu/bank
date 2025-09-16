@@ -13,10 +13,13 @@ metadata:
   name: mysql-service
   namespace: bank-namespace
 spec:
-  ports:
-    - port: 3306
+  type: ClusterIP
   selector:
     app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,6 +27,7 @@ metadata:
   name: mysql
   namespace: bank-namespace
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mysql
@@ -41,8 +45,8 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: mysql-root-password
-            - name: MYSQL_DATABASE       # <-- Added this
-              value: bank                # <-- Added this
+            - name: MYSQL_DATABASE
+              value: bank
           ports:
             - containerPort: 3306
           resources:
