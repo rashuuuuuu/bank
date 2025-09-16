@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bank-backend
+  name: bank-app
   namespace: bank-namespace
   labels:
-    app: bank-backend
+    app: bank-app
 spec:
   type: ClusterIP
   selector:
-    app: bank-backend
+    app: bank-app
   ports:
     - port: 80
       targetPort: 8080

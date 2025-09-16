@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bank-backend
+  name: bank-app
   namespace: bank-namespace
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: bank-backend
+      app: bank-app
   template:
     metadata:
       labels:
-        app: bank-backend
+        app: bank-app
     spec:
       containers:
-        - name: bank-backend
+        - name: bank-app
           image: 172.17.78.58:8000/bank/bank-app:1.0
           ports:
             - containerPort: 8080
