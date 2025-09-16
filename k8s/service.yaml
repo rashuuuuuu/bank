@@ -10,6 +10,6 @@ spec:
   selector:
     app: bank-app
   ports:
-    - port: 80       # internal cluster port
-      targetPort: 8080
-
+    - port: 80
+      targetPort: 8089
+      protocol: TCP
