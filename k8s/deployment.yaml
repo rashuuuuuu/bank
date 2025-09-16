@@ -13,8 +13,30 @@ spec:
       labels:
         app: bank-app
     spec:
+      imagePullSecrets:
+        - name: harbor-registry-secret
       containers:
         - name: bank-app
           image: 172.17.78.58:8000/bank/bank-app:1.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
