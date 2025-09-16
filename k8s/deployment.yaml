@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: bank-app
   namespace: bank-namespace
-  labels:
-    app: bank-app
 spec:
   replicas: 1
   selector:
@@ -29,24 +27,23 @@ spec:
               value: root
             - name: SPRING_LIQUIBASE_ENABLED
               value: "false"
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8089
-            initialDelaySeconds: 30   # give app time to start
-            periodSeconds: 10
-            failureThreshold: 6
+
+
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8089
-            initialDelaySeconds: 30   # match app startup
-            periodSeconds: 5
-            failureThreshold: 6
-          resources:
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-            requests:
-              memory: "256Mi"
-              cpu: "200m"
+            initialDelaySeconds: 20   # wait before first check
+            periodSeconds: 10         # check interval
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8089
+            initialDelaySeconds: 40   # allow app to warm up
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
