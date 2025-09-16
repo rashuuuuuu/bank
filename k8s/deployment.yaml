@@ -13,21 +13,11 @@ spec:
       labels:
         app: bank-app
     spec:
-      imagePullSecrets:
-        - name: harbor-registry-secret
       containers:
         - name: bank-app
           image: 172.17.78.58:8000/bank/bank-app:1.0
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8089
-          resources:
-            requests:
-              cpu: "200m"
-              memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:mysql://mysql-service:3306/bank
@@ -37,15 +27,23 @@ spec:
               value: root
             - name: SPRING_LIQUIBASE_ENABLED
               value: "false"
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8089
-            initialDelaySeconds: 60
-            periodSeconds: 10
+
+          # ✅ Add health probes
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8089
-            initialDelaySeconds: 60
-            periodSeconds: 5
+            initialDelaySeconds: 20   # wait before first check
+            periodSeconds: 10         # check interval
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8089
+            initialDelaySeconds: 40   # allow app to warm up
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
