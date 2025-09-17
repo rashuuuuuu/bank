@@ -52,7 +52,7 @@ metadata:
   name: mysql
   namespace: bank-namespace
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: mysql
