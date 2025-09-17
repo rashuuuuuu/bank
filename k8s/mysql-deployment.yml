@@ -21,6 +21,31 @@ spec:
       targetPort: 3306
       protocol: TCP
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  namespace: bank-namespace
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:               # For local development; on cloud, use a storage class
+    path: /mnt/data/mysql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: bank-namespace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,6 +74,9 @@ spec:
               value: bank
           ports:
             - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
           resources:
             requests:
               memory: "256Mi"
@@ -56,3 +84,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
